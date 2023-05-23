@@ -1,6 +1,7 @@
 pub mod utils;
 
 pub mod netease;
+pub mod qqmusic;
 
 use std::time::Duration;
 

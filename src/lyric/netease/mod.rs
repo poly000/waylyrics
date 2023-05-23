@@ -8,18 +8,13 @@ use tokio::runtime::Handle;
 
 use ncmapi::types::{LyricResp, SearchSongResp};
 
-use super::Lyric;
+use super::{utils::LrcLyric};
 
 pub struct NeteaseLyricProvider {}
 
-pub struct NeteaseLyric {
-    lyric: Option<String>,
-    tlyric: Option<String>,
-}
-
 impl super::LyricProvider for NeteaseLyricProvider {
     type Id = usize;
-    type LStore = NeteaseLyric;
+    type LStore = LrcLyric;
 
     const NAME: &'static str = "网易云音乐";
 
@@ -88,7 +83,7 @@ impl super::LyricProvider for NeteaseLyricProvider {
         &self,
         handle: &Handle,
         id: Self::Id,
-    ) -> Result<NeteaseLyric, Box<dyn std::error::Error>> {
+    ) -> Result<LrcLyric, Box<dyn std::error::Error>> {
         let handle = handle.clone();
         let cookie_path = crate::CONFIG_HOME.with_borrow(|home| home.to_owned() + "ncm-cookie");
         let query_result = thread::spawn(move || {
@@ -108,7 +103,7 @@ impl super::LyricProvider for NeteaseLyricProvider {
 
         tracing::debug!("lyric query result: {lyric_resp:?}");
 
-        Ok(NeteaseLyric {
+        Ok(LrcLyric {
             lyric: lyric_resp.lrc.map(|l| l.lyric),
             tlyric: lyric_resp.tlyric.map(|l| l.lyric),
         })
@@ -116,30 +111,5 @@ impl super::LyricProvider for NeteaseLyricProvider {
 
     fn new() -> Result<Box<Self>, Box<dyn std::error::Error>> {
         Ok(Box::new(Self {}))
-    }
-}
-
-impl super::LyricStore for NeteaseLyric {
-    fn get_lyric(&self) -> Lyric<'_> {
-        let lyric = self.lyric.as_deref();
-        match_lyric(lyric)
-    }
-
-    fn get_translated_lyric(&self) -> Lyric<'_> {
-        let lyric = self.tlyric.as_deref();
-        match_lyric(lyric)
-    }
-}
-
-fn match_lyric(lyric: Option<&str>) -> Lyric<'_> {
-    match lyric {
-        Some("") | None => super::Lyric::None,
-        Some(lyric) => {
-            if let Ok(parsed) = super::utils::lrc_iter(lyric.split("\n")) {
-                Lyric::LineTimestamp(parsed)
-            } else {
-                Lyric::NoTimestamp
-            }
-        }
     }
 }
