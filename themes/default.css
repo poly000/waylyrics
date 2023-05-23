@@ -19,3 +19,9 @@ label#translated {
     font-size: 24px;
     padding: 7px;
 }
+
+label#lock {
+    font-size: 15px;
+    border-radius: 3px;
+    background-color: rgba(0, 0, 0, 0.1);
+}

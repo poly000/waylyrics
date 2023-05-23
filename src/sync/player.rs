@@ -81,8 +81,8 @@ fn try_sync_player(window: &crate::app::Window) -> Result<(), PlayerStatus> {
                 error!("lyric fetch error: {e}");
             }
 
-            app::get_label(window, false).set_label(DEFAULT_TEXT);
-            app::get_label(window, true).set_label("");
+            app::get_label_act(window, false, |lbl| lbl.set_label(DEFAULT_TEXT));
+            app::get_label_act(window, true, |lbl| lbl.set_label(""));
         }
 
         // sync play position
@@ -138,13 +138,13 @@ pub fn register_mpris_sync(app: WeakRef<Application>, interval: Duration) {
                     info!("connected to player: {}", player.identity());
                     PLAYER.set(Some(player));
                 });
-                app::get_label(&window, true).set_label(DEFAULT_TEXT);
-                app::get_label(&window, false).set_label("");
+                app::get_label_act(&window, true, |lbl| lbl.set_label(DEFAULT_TEXT));
+                app::get_label_act(&window, true, |lbl| lbl.set_label(""));
                 TRACK_PLAYING_PAUSED.set((None, false));
             }
             Err(PlayerStatus::Unsupported(kind)) => {
-                app::get_label(&window, true).set_label("Unsupported Player");
-                app::get_label(&window, false).set_label("");
+                app::get_label_act(&window, true, |lbl| lbl.set_label("Unsupported Player"));
+                app::get_label_act(&window, true, |lbl| lbl.set_label(""));
 
                 utils::clear_lyric(&window);
                 error!(kind);
@@ -240,7 +240,7 @@ fn set_lyric<P: LyricProvider>(
 
     if !matches!(tlyric, LyricOwned::LineTimestamp(_)) {
         info!("No translated lyric for {} - {title}", artists,);
-        app::get_label(window, true).set_visible(false);
+        app::get_label_act(window, true, |lbl| lbl.set_visible(false));
     }
     LYRIC.set((olyric, tlyric));
 

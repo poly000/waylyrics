@@ -4,7 +4,7 @@ use gtk::subclass::prelude::ObjectSubclassIsExt;
 use gtk::{glib, prelude::*};
 use gtk::{glib::WeakRef, Application};
 
-use crate::app::{self, get_label};
+use crate::app::{self, get_label_act};
 use crate::lyric::{LyricLineOwned, LyricOwned};
 
 use super::{LYRIC, TRACK_PLAYING_PAUSED};
@@ -57,10 +57,10 @@ fn set_origin_lyric(window: &app::Window, new_text: Option<&LyricLineOwned>) {
         }
 
         window.imp().lyric_playing.set(Some(*start_time));
-        get_label(window, false).set_label(text);
+        get_label_act(window, false, |label| label.set_label(text));
     } else {
         window.imp().lyric_playing.set(None);
-        get_label(window, false).set_label("");
+        get_label_act(window, false, |label| label.set_label(""));
     }
 }
 
@@ -79,9 +79,9 @@ fn set_translation_lyric(window: &app::Window, new_text: Option<&LyricLineOwned>
             .imp()
             .lyric_playing_translation
             .set(Some(*start_time));
-        get_label(window, true).set_label(text);
+        get_label_act(window, true, |label| label.set_label(text));
     } else {
         window.imp().lyric_playing_translation.set(None);
-        get_label(window, true).set_label("");
+        get_label_act(window, true, |label| label.set_label(""));
     }
 }

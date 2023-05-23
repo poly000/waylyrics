@@ -1,15 +1,19 @@
-use std::cell::Cell;
+use std::cell::{Cell, RefCell};
 use std::time::{Duration, SystemTime};
 
 use gio::Settings;
 use glib::once_cell::sync::OnceCell;
 use glib::signal::Inhibit;
 use gtk::subclass::prelude::*;
-use gtk::{gio, glib, ApplicationWindow};
+use gtk::{gio, glib, ApplicationWindow, Label};
 
 #[derive(Default)]
 pub struct Window {
     pub settings: OnceCell<Settings>,
+
+    pub original: RefCell<Label>,
+    pub translated: RefCell<Label>,
+
     pub cache_lyrics: Cell<bool>,
     pub lyric_start: Cell<Option<SystemTime>>,
     pub lyric_playing: Cell<Option<Duration>>,
